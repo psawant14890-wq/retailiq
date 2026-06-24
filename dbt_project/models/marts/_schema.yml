@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Cleaned, one-row-per-order staging table with a computed late-delivery flag."
+    columns:
+      - name: order_id
+        description: "Primary key — unique order identifier."
+        tests:
+          - unique
+          - not_null
+      - name: order_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['delivered', 'shipped', 'canceled', 'unavailable', 'invoiced', 'processing', 'created', 'approved']
+
+  - name: stg_order_items
+    description: "Order line items with computed line_total (price + freight)."
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+
+  - name: mart_delivery_satisfaction
+    description: "Business-ready mart joining delivery performance, revenue, and review scores per order. Powers the dashboard."
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: delivery_bucket
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['on_time', 'late_1_7_days', 'late_7plus_days']
+      - name: order_value
+        tests:
+          - not_null
