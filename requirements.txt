@@ -1,0 +1,10 @@
+pandas==2.2.3
+numpy==1.26.4
+matplotlib==3.9.2
+seaborn==0.13.2
+scikit-learn==1.5.2
+statsmodels==0.14.4
+psycopg2-binary==2.9.10
+pytest==9.1.1
+dbt-core==1.11.11
+dbt-postgres==1.10.1
