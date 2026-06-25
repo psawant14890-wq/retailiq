@@ -52,8 +52,11 @@ print(f"Train: {len(train)} weeks, Test (held out): {len(test)} weeks")
 model = SARIMAX(train, order=(2, 1, 2), trend="c", enforce_stationarity=False, enforce_invertibility=False)
 fit = model.fit(disp=False)
 
-forecast = fit.forecast(steps=len(test))
+forecast_obj = fit.get_forecast(steps=len(test))
+forecast = forecast_obj.predicted_mean
 forecast.index = test.index
+conf_int = forecast_obj.conf_int(alpha=0.05)  # 95% confidence interval
+conf_int.index = test.index
 
 # Real evaluation metrics on held-out data
 rmse = np.sqrt(mean_squared_error(test, forecast))
@@ -66,10 +69,18 @@ print(f"MAPE: {mape:.1f}%")
 print(f"Mean actual weekly revenue (test period): R$ {mean_weekly_revenue:,.2f}")
 print(f"RMSE as % of mean revenue: {100*rmse/mean_weekly_revenue:.1f}%")
 
-print("\nActual vs Forecast (held-out weeks):")
-comparison = pd.DataFrame({"actual": test, "forecast": forecast.round(2)})
+print("\nActual vs Forecast (held-out weeks), with 95% confidence interval:")
+comparison = pd.DataFrame({
+    "actual": test,
+    "forecast": forecast.round(2),
+    "ci_lower_95": conf_int.iloc[:, 0].round(2),
+    "ci_upper_95": conf_int.iloc[:, 1].round(2),
+})
 comparison["abs_error"] = (comparison["actual"] - comparison["forecast"]).abs().round(2)
+comparison["actual_within_ci"] = (comparison["actual"] >= comparison["ci_lower_95"]) & (comparison["actual"] <= comparison["ci_upper_95"])
 print(comparison)
+coverage = comparison["actual_within_ci"].mean() * 100
+print(f"\n95% CI empirical coverage on held-out test: {coverage:.0f}% of actuals fell within the predicted interval")
 
 # Save results
 results = {
@@ -80,6 +91,7 @@ results = {
     "mean_test_revenue": round(float(mean_weekly_revenue), 2),
     "rmse_pct_of_mean": round(float(100*rmse/mean_weekly_revenue), 1),
     "model": "SARIMAX(2,1,2) with trend",
+    "ci_95_empirical_coverage_pct": round(float(coverage), 1),
 }
 with open("/home/claude/retailiq/forecast_results.json", "w") as f:
     json.dump(results, f, indent=2)
