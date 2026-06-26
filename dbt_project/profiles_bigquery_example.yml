@@ -1,0 +1,29 @@
+# Add this as a SECOND target in your profiles.yml (~/.dbt/profiles.yml)
+# alongside the existing 'dev' (Postgres) target — don't replace it, add to it.
+#
+# This lets you run either:
+#   dbt run --target dev        (local Postgres, what we've been using)
+#   dbt run --target bigquery   (BigQuery, once set up)
+
+retailiq:
+  target: dev  # keep this as dev for now; switch to bigquery once tested
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      user: postgres
+      password: postgres
+      port: 5432
+      dbname: retailiq
+      schema: dbt_marts
+      threads: 4
+
+    bigquery:
+      type: bigquery
+      method: service-account
+      project: YOUR_GCP_PROJECT_ID        # from BigQuery console, step 2 below
+      dataset: retailiq                    # the BigQuery dataset you'll create
+      keyfile: /path/to/your-service-account-key.json   # downloaded in step 3
+      threads: 4
+      timeout_seconds: 300
+      location: US
