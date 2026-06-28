@@ -2,6 +2,14 @@
 
 A full-stack data analytics project on real Brazilian e-commerce data (Olist marketplace, ~100K orders, 2017–2018), built to the top-tier standard: relational SQL, dbt-modeled warehouse layer, evaluated forecasting, and a quantified business recommendation.
 
+**🔴 Live Dashboard:** [RetailIQ Interactive Analytics](https://retailiq-wq4exudkd9nfhh8aio6yjy.streamlit.app)
+
+**📊 MBB Executive Summary:** See `excel_deck/RetailIQ_Executive_Deck.pptx`
+
+**📈 Sensitivity Model:** See `excel_deck/RetailIQ_Sensitivity_Model.xlsx`
+
+---
+
 ## Situation → Complication → Recommendation
 
 **Situation:** Olist is a multi-seller e-commerce marketplace connecting ~3,000 small sellers to customers across Brazil. Revenue grew from R$280 in Sept 2016 to a peak of over R$1.17M/month by Nov 2017, with a visible Black Friday seasonal spike.
@@ -88,16 +96,27 @@ retailiq/
 ├── dbt_project/
 │   ├── models/staging/                # stg_orders, stg_order_items
 │   ├── models/marts/                  # mart_delivery_satisfaction + schema tests
+│   ├── profiles_bigquery_example.yml  # BigQuery migration template (adapter-agnostic models)
 │   └── dbt_project.yml
 ├── python/
 │   ├── forecast_model.py              # SARIMA forecast with held-out evaluation + 95% CI
 │   ├── sensitivity_analysis.py        # 3-scenario sensitivity analysis on target states
 │   └── visualize.py                   # Dashboard chart generation
+├── streamlit_app/
+│   ├── app.py                         # Live 2-page interactive dashboard
+│   ├── data_prep.py                   # Generates pre-aggregated CSVs from Postgres
+│   ├── data/                          # 11 small pre-aggregated CSVs (<10KB total)
+│   └── requirements.txt
+├── excel_deck/
+│   ├── RetailIQ_Sensitivity_Model.xlsx  # Interactive MBB-style model, 139 live formulas
+│   └── RetailIQ_Executive_Deck.pptx     # 3-slide Situation-Complication-Recommendation deck
 ├── tests/
 │   └── test_data_quality.py           # 6 pytest data validation tests
 ├── requirements.txt
 └── README.md
 ```
+
+**Note:** the deployed live app additionally relies on a few Streamlit Cloud-specific config files (`.python-version`, a deploy-scoped `requirements.txt` split) created directly during deployment troubleshooting — see commit history for the full debugging trail.
 
 ## How to Reproduce
 ```bash
