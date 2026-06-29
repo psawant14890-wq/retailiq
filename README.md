@@ -8,6 +8,8 @@ A full-stack data analytics project on real Brazilian e-commerce data (Olist mar
 
 **📈 Sensitivity Model:** See `excel_deck/RetailIQ_Sensitivity_Model.xlsx`
 
+**📊 Power BI Dashboard:** see `PowerBI Dashboards/retailiq.pbix`
+
 ---
 
 ## Situation → Complication → Recommendation
